@@ -127,7 +127,7 @@ export default function ContactForm() {
         data.append('projectDocs', selectedFile);
       }
 
-      const response = await fetch('/api/inquiry', {
+      const response = await fetch('https://engineering-works.onrender.com/api/inquiry', {
         method: 'POST',
         body: data,
       });
