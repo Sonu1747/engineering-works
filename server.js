@@ -3,9 +3,10 @@ import cors from 'cors';
 import nodemailer from 'nodemailer';
 import multer from 'multer';
 import dotenv from 'dotenv';
+import dns from 'dns';
 
 dotenv.config();
-
+dns.setDefaultResultOrder('ipv4first');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -20,14 +21,18 @@ const upload = multer({
   limits: { fileSize: 15 * 1024 * 1024 } // 15MB limit
 });
 
-// Nodemailer SMTP setup using Gmail credentials
+/// Nodemailer SMTP setup using Gmail credentials
 const transporter = nodemailer.createTransport({
+  service: 'gmail',
   host: 'smtp.gmail.com',
-  port: 465,
-  secure: true, // true for 465, false for other ports
+  port: 587,
+  secure: false,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
+  },
+  tls: {
+    rejectUnauthorized: false,
   },
 });
 
@@ -256,7 +261,7 @@ app.post('/api/inquiry', upload.single('projectDocs'), async (req, res) => {
     // Send the email
     await transporter.sendMail(mailOptions);
     console.log('Inquiry Email Sent Successfully for:', contactName);
-    
+
     res.status(200).json({ success: true, message: 'Inquiry details mailed successfully' });
 
   } catch (error) {
